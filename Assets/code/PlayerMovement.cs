@@ -1,3 +1,4 @@
+using NUnit.Framework;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
@@ -7,7 +8,7 @@ public class PlayerMovement : MonoBehaviour
 
     public Transform groundCheck;
 
-    public float groundCheckDitance =.12f;
+    public float groundCheckDitance =.8f;
 
     public Vector2 groundCheckOffset = new Vector2 (0f, -.5f);
 
@@ -21,11 +22,16 @@ public class PlayerMovement : MonoBehaviour
 
     private SpriteRenderer spriteRenderer;
 
+
+    private Animator animator;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        animator = GetComponent<Animator>();
 
     }
 
@@ -48,6 +54,11 @@ public class PlayerMovement : MonoBehaviour
             else if (horizInput < .1f) spriteRenderer.flipX = true ;
 
         }
+        if (animator != null)
+        {
+           animator.SetFloat ("moveInput" ,Mathf.Abs(horizInput));
+           animator.SetBool("isGrounded", isGrounded);
+        }
         
 
     }
@@ -55,5 +66,19 @@ public class PlayerMovement : MonoBehaviour
     void FixedUpdate ()
     {
         rb.linearVelocity = new Vector2(horizInput * speed, rb.linearVelocity.y);
+    }
+
+    void OnDrawGizmosSelected()
+    {
+           if (groundCheck != null)
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(groundCheck.position, groundCheck.position + Vector3.down * groundCheckDitance);
+        }
+        else
+        {
+            Gizmos.color = Color.yellow;
+            Gizmos.DrawLine(transform.position + (Vector3)groundCheckOffset, transform.position + (Vector3)groundCheckOffset + Vector3.down * groundCheckDitance);
+        }
     }
 }
